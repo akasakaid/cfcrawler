@@ -1,7 +1,7 @@
 import random
 import typing
 from functools import lru_cache
-
+import ssl
 from httpx import AsyncHTTPTransport, _types
 from httpx._client import AsyncClient as _AsyncClient
 from httpx._config import (
@@ -54,11 +54,11 @@ class AsyncClient(_AsyncClient):
         params: typing.Optional[_types.QueryParamTypes] = None,
         headers: typing.Optional[_types.HeaderTypes] = None,
         cookies: typing.Optional[_types.CookieTypes] = None,
-        verify: _types.VerifyTypes = False,
+        verify: ssl.SSLContext | str | bool = True,
         cert: typing.Optional[_types.CertTypes] = None,
         http1: bool = True,
         http2: bool = False,
-        proxies: typing.Optional[_types.ProxiesTypes] = None,
+        proxies: typing.Optional[_types.ProxyTypes] = None,
         mounts: typing.Optional[typing.Mapping[str, AsyncBaseTransport]] = None,
         timeout: _types.TimeoutTypes = DEFAULT_TIMEOUT_CONFIG,
         follow_redirects: bool = False,
@@ -96,9 +96,10 @@ class AsyncClient(_AsyncClient):
             cert=cert,
             http2=http2,
             transport=self._custom_transport,
-            app=app,
+            # app=app,
             http1=http1,
-            proxies=proxies,
+            proxy=proxies,
+            # proxies=proxies,
             limits=limits,
             trust_env=trust_env,
             default_encoding=default_encoding,
@@ -107,7 +108,7 @@ class AsyncClient(_AsyncClient):
         self.rotate_useragent()
 
     def rotate_useragent(self):
-        self.headers.update({"User-Agent": self.get_random_user_agent()})
+        # self.headers.update({"User-Agent": self.get_random_user_agent()})
         mimic_tls_fingerprint_from_browser(
             pool=self._custom_transport._pool,
             browser=self.browser,
